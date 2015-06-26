@@ -10,12 +10,6 @@
 
 @interface ConfigurationViewController ()
 
-@property (strong, nonatomic) IBOutlet UITextField *fillChamberPart1Time;
-@property (strong, nonatomic) IBOutlet UITextField *fillChamberPart2Time;
-@property (strong, nonatomic) IBOutlet UITextField *replaceChamberBottomTime;
-@property (strong, nonatomic) IBOutlet UITextField *replaceChamberTopTime;
-@property (strong, nonatomic) IBOutlet UITextField *emptyChamberTopTime;
-@property (strong, nonatomic) IBOutlet UITextField *fillChamberTopTime;
 
 @property (strong, nonatomic) NSArray *stages;
 @property (strong, nonatomic) NSArray *times;
@@ -30,8 +24,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    
+        
     [self initializeDefaultArrays];
     
     
@@ -90,6 +83,7 @@
     cell.textLabel.text = [self.stages objectAtIndex:indexPath.row];
     
     UITextField *timeTextField = (UITextField *) [cell viewWithTag:102];
+    timeTextField.delegate = self;
     
     NSMutableDictionary *data = [self checkOrCreatePLIST];
 
@@ -179,7 +173,7 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [textField resignFirstResponder];
-    return NO;
+    return YES;
 }
 
 

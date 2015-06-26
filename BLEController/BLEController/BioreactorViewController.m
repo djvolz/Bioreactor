@@ -53,6 +53,9 @@ uint8_t bio_init_done = 0;
 {
     [super viewDidLoad];
     
+    self.currentPins = [NSMutableArray array];
+
+    
     
     NSLog(@"ControlView: viewDidLoad");
 }
@@ -207,14 +210,14 @@ NSTimer *syncTimer;
 
 
 
-uint8_t M1   = 36;//22;
-uint8_t M2   = 23;
-uint8_t M3   = 28;//24;
+uint8_t M1   = 22;
+uint8_t M2   = 25;
+uint8_t M3   = 28;
 
-uint8_t TV   = 26;//25;
-uint8_t TVex = 38;//26;
-uint8_t BV   = 27;
-uint8_t BVex = 39;//28;
+uint8_t TV   = 23;
+uint8_t TVex = 36;
+uint8_t BV   = 24;
+uint8_t BVex = 37;
 
 float fillChamberPart1Time     ;
 float fillChamberPart2Time     ;
@@ -228,20 +231,20 @@ float fillChamberTopTime       ;
 - (IBAction)selectChamberSegmentedControl:(UISegmentedControl *)sender {
     if ([sender selectedSegmentIndex] == 0)
     {
+        TV   = 23;
+        TVex = 36;
+        BV   = 24;
+        BVex = 37;
+    } else if ([sender selectedSegmentIndex] == 1) {
         TV   = 26;
         TVex = 38;
         BV   = 27;
         BVex = 39;
-    } else if ([sender selectedSegmentIndex] == 1) {
-        TV   = 29;
-        TVex = 30;
-        BV   = 31;
-        BVex = 32;
     } else {
-        TV   = 33;
-        TVex = 34;
-        BV   = 35;
-        BVex = 36;
+        TV   = 29;
+        TVex = 40;
+        BV   = 30;
+        BVex = 41;
     }
     
 }
@@ -290,6 +293,8 @@ float fillChamberTopTime       ;
         [self.currentPins removeObject:@(pin)];
     }
     
+    NSLog(@"%@", [NSString stringWithFormat:@"%d", (uint8_t)pin]);
+
     [protocol digitalWrite:pin Value:state];
     bio_pin_digital[pin] = state;
 }
@@ -310,12 +315,12 @@ float fillChamberTopTime       ;
 
 - (void) startSequence {
     
-    fillChamberPart1Time     = [[self.bioreactorPreferences objectForKey:@"1"] floatValue];
-    fillChamberPart2Time     = [[self.bioreactorPreferences objectForKey:@"2"] floatValue];
-    replaceChamberBottomTime = [[self.bioreactorPreferences objectForKey:@"3"] floatValue];
-    replaceChamberTopTime    = [[self.bioreactorPreferences objectForKey:@"4"] floatValue];
-    emptyChamberTopTime      = [[self.bioreactorPreferences objectForKey:@"5"] floatValue];
-    fillChamberTopTime       = [[self.bioreactorPreferences objectForKey:@"6"] floatValue];
+    fillChamberPart1Time     = [[self.bioreactorPreferences objectForKey:@"fillChamberPart1Time"] floatValue];
+    fillChamberPart2Time     = [[self.bioreactorPreferences objectForKey:@"fillChamberPart2Time"] floatValue];
+    replaceChamberBottomTime = [[self.bioreactorPreferences objectForKey:@"replaceChamberBottomTime"] floatValue];
+    replaceChamberTopTime    = [[self.bioreactorPreferences objectForKey:@"replaceChamberTopTime"] floatValue];
+    emptyChamberTopTime      = [[self.bioreactorPreferences objectForKey:@"emptyChamberTopTime"] floatValue];
+    fillChamberTopTime       = [[self.bioreactorPreferences objectForKey:@"fillChamberTopTime"] floatValue];
     
     
     switch ((int)self.stageStepper.value) {
@@ -392,7 +397,7 @@ float fillChamberTopTime       ;
     [self switchPin:TV toState:LOW];
     
     
-    if (!self.singleStageSwtich.state) {
+    if (!self.singleStageSwtich.on) {
         [self replaceChamberBottomPart1];
     } else {
         [self.sequenceActivityIndicator stopAnimating];
@@ -430,7 +435,7 @@ float fillChamberTopTime       ;
     [self switchPin:BV toState:LOW];
     [self switchPin:BVex toState:LOW];
     
-    if (!self.singleStageSwtich.state) {
+    if (!self.singleStageSwtich.on) {
         [self replaceChamberTopPart1];
     } else {
         [self.sequenceActivityIndicator stopAnimating];
@@ -463,7 +468,7 @@ float fillChamberTopTime       ;
     [self switchPin:TV toState:LOW];
     [self switchPin:TVex toState:LOW];
     
-    if (!self.singleStageSwtich.state) {
+    if (!self.singleStageSwtich.on) {
         [self emptyChamberTopPart1];
     } else {
         [self.sequenceActivityIndicator stopAnimating];
@@ -499,7 +504,7 @@ float fillChamberTopTime       ;
     [self switchPin:TV toState:LOW];
     [self switchPin:TVex toState:LOW];
     
-    if (!self.singleStageSwtich.state) {
+    if (!self.singleStageSwtich.on) {
         [self fillChamberTopPart1];
     } else {
         [self.sequenceActivityIndicator stopAnimating];
@@ -538,7 +543,6 @@ float fillChamberTopTime       ;
 }
 
 
-
 #pragma mark - Handling PLIST Creation/Existence Check
 
 - (NSMutableDictionary *) getBioreactorDefaults {
@@ -555,12 +559,12 @@ float fillChamberTopTime       ;
     
     bioreactorPreferences = [[NSMutableDictionary alloc] init];
     
-    [bioreactorPreferences setObject: fillChamberPart1Time     forKey:[[NSNumber numberWithInt:1] stringValue]];
-    [bioreactorPreferences setObject: fillChamberPart2Time     forKey:[[NSNumber numberWithInt:2] stringValue]];
-    [bioreactorPreferences setObject: replaceChamberBottomTime forKey:[[NSNumber numberWithInt:3] stringValue]];
-    [bioreactorPreferences setObject: replaceChamberTopTime    forKey:[[NSNumber numberWithInt:4] stringValue]];
-    [bioreactorPreferences setObject: emptyChamberTopTime      forKey:[[NSNumber numberWithInt:5] stringValue]];
-    [bioreactorPreferences setObject: fillChamberTopTime       forKey:[[NSNumber numberWithInt:6] stringValue]];
+    [bioreactorPreferences setObject: fillChamberPart1Time     forKey:@"fillChamberPart1Time"];
+    [bioreactorPreferences setObject: fillChamberPart2Time     forKey:@"fillChamberPart2Time"];
+    [bioreactorPreferences setObject: replaceChamberBottomTime forKey:@"replaceChamberBottomTime"];
+    [bioreactorPreferences setObject: replaceChamberTopTime    forKey:@"replaceChamberTopTime"];
+    [bioreactorPreferences setObject: emptyChamberTopTime      forKey: @"emptyChamberTopTime"];
+    [bioreactorPreferences setObject: fillChamberTopTime       forKey:@"fillChamberTopTime"];
     
     return bioreactorPreferences;
 }
@@ -603,7 +607,6 @@ float fillChamberTopTime       ;
 {
     if ([self.startStop.titleLabel.text isEqualToString:@"Start"]) {
         [self.startStop setTitle:@"Pause" forState:UIControlStateNormal];
-        [self.startStop setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         
         [self createTimer];
         
@@ -612,29 +615,37 @@ float fillChamberTopTime       ;
         [self.startStop setTitle:@"Resume" forState:UIControlStateNormal];
         [self.startStop setTitleColor:[UIColor colorWithRed:0/255 green:0/255 blue:255/255 alpha:1.0] forState:UIControlStateNormal];
         
-        for (id pin in self.currentPins) {
-            [protocol digitalWrite:(uint8_t)pin Value:LOW];
+        for (NSNumber *pin in self.currentPins) {
+            [protocol digitalWrite:(uint8_t)[pin unsignedCharValue] Value:LOW];
+            bio_pin_digital[(uint8_t)[pin unsignedCharValue]] = LOW;
         }
         
-//        pauseStart = [[NSDate dateWithTimeIntervalSinceNow:0] retain];
-//        previousFireDate = [[self.scheduleTimer fireDate] retain];
+
+
+        pauseStart = [NSDate dateWithTimeIntervalSinceNow:0];
+        previousFireDate = [self.scheduleTimer fireDate];
+        NSLog(@"pauseStart %@", pauseStart);
+        NSLog(@"previousFireDate %@", previousFireDate);
+        
         [self.scheduleTimer setFireDate:[NSDate distantFuture]];
         
     } else if ([self.startStop.titleLabel.text isEqualToString:@"Resume"])
     {
         [self.startStop setTitle:@"Pause" forState:UIControlStateNormal];
-        [self.startStop setTitleColor:[UIColor redColor] forState:UIControlStateNormal];
         
-        for (id pin in self.currentPins) {
-            [protocol digitalWrite:(uint8_t)pin Value:HIGH];
+        for (NSNumber *pin in self.currentPins) {
+            [protocol digitalWrite:(uint8_t)[pin unsignedCharValue] Value:HIGH];
+            bio_pin_digital[(uint8_t)[pin unsignedCharValue]] = HIGH;
         }
         
         float pauseTime = -1*[pauseStart timeIntervalSinceNow];
+        NSLog(@"newFireDate %@", [NSDate dateWithTimeInterval:pauseTime sinceDate:previousFireDate]);
         [self.scheduleTimer setFireDate:[NSDate dateWithTimeInterval:pauseTime sinceDate:previousFireDate]];
     }
 }
 
 - (void)createTimer {
+    NSLog(@"Current date: %@", [NSDate date]);
     switch (self.currentStage) {
         case 0:
             self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:fillChamberPart1Time
