@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E33b" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="rS3-R9-Ivy">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="rS3-R9-Ivy">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
@@ -339,7 +339,7 @@
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="PTi-Hu-liM">
                                 <rect key="frame" x="254" y="517" width="51" height="31"/>
                             </switch>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="u9F-Tk-HQv">
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="u9F-Tk-HQv">
                                 <rect key="frame" x="139" y="196" width="43" height="30"/>
                                 <state key="normal" title="Pause">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -387,10 +387,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="bioreactorProgress" destination="VBV-34-Tzm" id="7Dh-kH-roN"/>
+                        <outlet property="chamberSelectionSegmentedControl" destination="DMt-Ic-zRg" id="Ajs-aH-Ni8"/>
                         <outlet property="currentStageLabel" destination="svP-2U-WVd" id="L3T-cQ-eWJ"/>
                         <outlet property="sequenceActivityIndicator" destination="ndc-dC-TbQ" id="nVV-Ny-6pV"/>
                         <outlet property="singleStageSwtich" destination="PTi-Hu-liM" id="QcB-se-Wui"/>
                         <outlet property="stageStepper" destination="hf5-vh-Ibz" id="1xy-OD-Ya9"/>
+                        <outlet property="startSequenceButton" destination="i40-xW-HqK" id="kh5-Wm-6fC"/>
                         <outlet property="startStop" destination="u9F-Tk-HQv" id="Pud-ok-xBe"/>
                     </connections>
                 </viewController>

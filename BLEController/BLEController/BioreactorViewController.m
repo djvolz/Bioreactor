@@ -14,6 +14,7 @@
 @interface BioreactorViewController ()
 
 @property (nonatomic, strong) NSTimer *scheduleTimer;
+@property (strong, nonatomic) IBOutlet UISegmentedControl *chamberSelectionSegmentedControl;
 @property (strong, nonatomic) IBOutlet UIStepper *stageStepper;
 @property (strong, nonatomic) IBOutlet UILabel *currentStageLabel;
 @property (strong, nonatomic) IBOutlet UIProgressView *bioreactorProgress;
@@ -24,6 +25,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *startStop;
 @property (nonatomic) NSMutableDictionary *bioreactorPreferences;
 
+@property (strong, nonatomic) IBOutlet UIButton *startSequenceButton;
 @property (nonatomic) NSMutableArray *currentPins;
 
 
@@ -252,13 +254,14 @@ float fillChamberTopTime       ;
 - (IBAction)didTouchStartButton:(UIButton *)sender {
     [self startSequence];
     
-    [self.sequenceActivityIndicator startAnimating];
+    [self handleEndOfSequenceGUIElements:NO];
+    
 }
 
 - (IBAction)didTouchResetButton:(UIButton *)sender {
     [self resetAll];
     
-    [self.sequenceActivityIndicator stopAnimating];
+    [self handleEndOfSequenceGUIElements:YES];
 
 }
 
@@ -284,6 +287,7 @@ float fillChamberTopTime       ;
     }
 }
 
+
 #pragma Chambers
 
 - (void)switchPin:(uint8_t)pin toState:(uint8_t)state {
@@ -293,7 +297,7 @@ float fillChamberTopTime       ;
         [self.currentPins removeObject:@(pin)];
     }
     
-    NSLog(@"%@", [NSString stringWithFormat:@"%d", (uint8_t)pin]);
+    NSLog(@"%@ : %@", [NSString stringWithFormat:@"%d", (uint8_t)pin], [NSString stringWithFormat:@"%d", (uint8_t)state]);
 
     [protocol digitalWrite:pin Value:state];
     bio_pin_digital[pin] = state;
@@ -357,7 +361,10 @@ float fillChamberTopTime       ;
 - (void)fillChamberStep1 {
     self.currentStage = 0;
     self.bioreactorProgress.progress = 0;
-    self.currentStageLabel.text = [NSString stringWithFormat:@"Fill Top and Bottom Chamber"];
+    NSString *currentStage = [NSString stringWithFormat:@"0: Fill Top and Bottom Chamber"];
+    NSLog(@"%@", currentStage);
+    self.currentStageLabel.text = currentStage;
+    
     
     // Step 1	ON	M1, BV, BVex
     [self switchPin:M1 toState:HIGH];
@@ -400,7 +407,7 @@ float fillChamberTopTime       ;
     if (!self.singleStageSwtich.on) {
         [self replaceChamberBottomPart1];
     } else {
-        [self.sequenceActivityIndicator stopAnimating];
+        [self handleEndOfSequenceGUIElements:YES];
     }
 }
 
@@ -415,7 +422,9 @@ float fillChamberTopTime       ;
     self.currentStage = 2;
 
     self.bioreactorProgress.progress = (1.0/5.0);
-    self.currentStageLabel.text = [NSString stringWithFormat:@"Replace Chamber Bottom"];
+    NSString *currentStage = [NSString stringWithFormat:@"1: Replace Chamber Bottom"];
+    NSLog(@"%@", currentStage);
+    self.currentStageLabel.text = currentStage;
 
     
     // Step 1	ON	M2,BV,BVex
@@ -438,7 +447,7 @@ float fillChamberTopTime       ;
     if (!self.singleStageSwtich.on) {
         [self replaceChamberTopPart1];
     } else {
-        [self.sequenceActivityIndicator stopAnimating];
+        [self handleEndOfSequenceGUIElements:YES];
     }
 }
 
@@ -448,7 +457,9 @@ float fillChamberTopTime       ;
     self.currentStage = 3;
 
     self.bioreactorProgress.progress = (2.0/5.0);
-    self.currentStageLabel.text = [NSString stringWithFormat:@"Replace Chamber Top"];
+    NSString *currentStage = [NSString stringWithFormat:@"2: Replace Chamber Top"];
+    NSLog(@"%@", currentStage);
+    self.currentStageLabel.text = currentStage;
     
     // Step 1	 ON	M2, TV, TVex
     [self switchPin:M2 toState:HIGH];
@@ -471,7 +482,7 @@ float fillChamberTopTime       ;
     if (!self.singleStageSwtich.on) {
         [self emptyChamberTopPart1];
     } else {
-        [self.sequenceActivityIndicator stopAnimating];
+        [self handleEndOfSequenceGUIElements:YES];
     }
 }
 
@@ -484,7 +495,9 @@ float fillChamberTopTime       ;
     self.currentStage = 4;
     
     self.bioreactorProgress.progress = (3.0/5.0);
-    self.currentStageLabel.text = [NSString stringWithFormat:@"Empty Chamber Top"];
+    NSString *currentStage = [NSString stringWithFormat:@"3: Empty Chamber Top"];
+    NSLog(@"%@", currentStage);
+    self.currentStageLabel.text = currentStage;
     
     
     // Step 1	ON	M3, TV, TVex
@@ -507,7 +520,7 @@ float fillChamberTopTime       ;
     if (!self.singleStageSwtich.on) {
         [self fillChamberTopPart1];
     } else {
-        [self.sequenceActivityIndicator stopAnimating];
+        [self handleEndOfSequenceGUIElements:YES];
     }
 }
 
@@ -521,10 +534,11 @@ float fillChamberTopTime       ;
     self.currentStage = 5;
     
     self.bioreactorProgress.progress = (4.0/5.0);
-    self.currentStageLabel.text = [NSString stringWithFormat:@"Fill Chamber Top (Backfill)"];
+    NSString *currentStage = [NSString stringWithFormat:@"4: Fill Chamber Top (Backfill)"];
+    NSLog(@"%@", currentStage);
+    self.currentStageLabel.text = currentStage;
     
     // Step 1	ON	M1, TV
-    [self switchPin:M1 toState:HIGH];
     [self switchPin:M1 toState:HIGH];
     [self switchPin:TV toState:HIGH];
     
@@ -539,7 +553,7 @@ float fillChamberTopTime       ;
     [self switchPin:M1 toState:LOW];
     [self switchPin:TV toState:LOW];
     
-    [self.sequenceActivityIndicator stopAnimating];
+    [self handleEndOfSequenceGUIElements:YES];
 }
 
 
@@ -618,6 +632,8 @@ float fillChamberTopTime       ;
         for (NSNumber *pin in self.currentPins) {
             [protocol digitalWrite:(uint8_t)[pin unsignedCharValue] Value:LOW];
             bio_pin_digital[(uint8_t)[pin unsignedCharValue]] = LOW;
+            NSLog(@"%@ : LOW", [NSString stringWithFormat:@"%d", (uint8_t)[pin unsignedCharValue]]);
+
         }
         
 
@@ -636,6 +652,7 @@ float fillChamberTopTime       ;
         for (NSNumber *pin in self.currentPins) {
             [protocol digitalWrite:(uint8_t)[pin unsignedCharValue] Value:HIGH];
             bio_pin_digital[(uint8_t)[pin unsignedCharValue]] = HIGH;
+            NSLog(@"%@ : HIGH", [NSString stringWithFormat:@"%d", (uint8_t)[pin unsignedCharValue]]);
         }
         
         float pauseTime = -1*[pauseStart timeIntervalSinceNow];
@@ -653,6 +670,7 @@ float fillChamberTopTime       ;
                                                                 selector:@selector(fillChamberPart2:)
                                                                 userInfo:nil
                                                                  repeats:NO];
+            NSLog(@"Time: %f", fillChamberPart1Time);
             break;
         case 1:
             self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:fillChamberPart2Time
@@ -660,6 +678,7 @@ float fillChamberTopTime       ;
                                                                 selector:@selector(fillChamberPart3:)
                                                                 userInfo:nil
                                                                  repeats:NO];
+            NSLog(@"Time: %f", fillChamberPart2Time);
             break;
         case 2:
             self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:replaceChamberBottomTime
@@ -667,6 +686,8 @@ float fillChamberTopTime       ;
                                                                 selector:@selector(replaceChamberBottomPart2:)
                                                                 userInfo:nil
                                                                  repeats:NO];
+            NSLog(@"Time: %f", replaceChamberBottomTime);
+
             break;
         case 3:
             self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:replaceChamberTopTime
@@ -674,6 +695,8 @@ float fillChamberTopTime       ;
                                                                 selector:@selector(replaceChamberTopPart2:)
                                                                 userInfo:nil
                                                                  repeats:NO];
+            NSLog(@"Time: %f", replaceChamberTopTime);
+
             break;
         case 4:
             self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:emptyChamberTopTime
@@ -681,6 +704,8 @@ float fillChamberTopTime       ;
                                                                 selector:@selector(emptyChamberTopPart2:)
                                                                 userInfo:nil
                                                                  repeats:NO];
+            NSLog(@"Time: %f", emptyChamberTopTime);
+
             break;
         case 5:
             self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:fillChamberTopTime
@@ -688,12 +713,46 @@ float fillChamberTopTime       ;
                                                                 selector:@selector(fillChamberTopPart2:)
                                                                 userInfo:nil
                                                                  repeats:NO];
+            NSLog(@"Time: %f", fillChamberTopTime);
+
             break;
         default:
             break;
     }
 }
 
+
+#pragma mark - Helper Functions
+
+- (void)handleEndOfSequenceGUIElements:(BOOL)isEnd {
+    if (!isEnd) {
+        self.startSequenceButton.hidden = YES;
+        self.singleStageSwtich.enabled = NO;
+        self.stageStepper.hidden = YES;
+        self.chamberSelectionSegmentedControl.hidden = YES;
+        self.navigationItem.hidesBackButton = YES;
+        self.navigationController.navigationBarHidden = YES;
+
+
+
+        self.startStop.hidden = NO;
+        [self.sequenceActivityIndicator startAnimating];
+        
+    } else {
+        self.startSequenceButton.hidden = NO;
+        self.singleStageSwtich.enabled = YES;
+        self.stageStepper.hidden = NO;
+        self.chamberSelectionSegmentedControl.hidden = NO;
+        self.navigationItem.hidesBackButton = NO;
+        self.navigationController.navigationBarHidden = NO;
+
+
+
+
+        self.startStop.hidden = YES;
+        [self.sequenceActivityIndicator stopAnimating];
+    }
+}
 
 
 @end
