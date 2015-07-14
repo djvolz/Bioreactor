@@ -211,13 +211,13 @@ NSTimer *syncTimer;
 
 
 uint8_t M1   = 22;
-uint8_t M2   = 25;
-uint8_t M3   = 28;
+uint8_t M2   = 23;
+uint8_t M3   = 24;
 
-uint8_t TV   = 23;
-uint8_t TVex = 36;
-uint8_t BV   = 24;
-uint8_t BVex = 37;
+uint8_t TV   = 25;
+uint8_t TVex = 26;
+uint8_t BV   = 27;
+uint8_t BVex = 28;
 
 float fillChamberPart1Time     ;
 float fillChamberPart2Time     ;
@@ -231,20 +231,20 @@ float fillChamberTopTime       ;
 - (IBAction)selectChamberSegmentedControl:(UISegmentedControl *)sender {
     if ([sender selectedSegmentIndex] == 0)
     {
-        TV   = 23;
-        TVex = 36;
-        BV   = 24;
-        BVex = 37;
-    } else if ([sender selectedSegmentIndex] == 1) {
-        TV   = 26;
-        TVex = 38;
+        TV   = 25;
+        TVex = 26;
         BV   = 27;
-        BVex = 39;
-    } else {
+        BVex = 28;
+    } else if ([sender selectedSegmentIndex] == 1) {
         TV   = 29;
-        TVex = 40;
-        BV   = 30;
-        BVex = 41;
+        TVex = 30;
+        BV   = 31;
+        BVex = 32;
+    } else {
+        TV   = 33;
+        TVex = 34;
+        BV   = 35;
+        BVex = 36;
     }
     
 }
