@@ -217,7 +217,7 @@ uint8_t M2   = 23;
 uint8_t M3   = 24;
 
 uint8_t TV   = 25;
-uint8_t TVex = 26;
+uint8_t TVex = 38;
 uint8_t BV   = 27;
 uint8_t BVex = 28;
 
@@ -234,7 +234,7 @@ float fillChamberTopTime       ;
     if ([sender selectedSegmentIndex] == 0)
     {
         TV   = 25;
-        TVex = 26;
+        TVex = 38;
         BV   = 27;
         BVex = 28;
     } else if ([sender selectedSegmentIndex] == 1) {
@@ -243,7 +243,7 @@ float fillChamberTopTime       ;
         BV   = 31;
         BVex = 32;
     } else {
-        TV   = 33;
+        TV   = 37;
         TVex = 34;
         BV   = 35;
         BVex = 36;
@@ -360,6 +360,8 @@ float fillChamberTopTime       ;
 //Event	Fill Chamber 1						For filling chambers, there needs to be an option to choose between M1 and M2
 - (void)fillChamberStep1 {
     self.currentStage = 0;
+    self.stageStepper.value = self.currentStage;
+    
     self.bioreactorProgress.progress = 0;
     NSString *currentStage = [NSString stringWithFormat:@"0: Fill Top and Bottom Chamber"];
     NSLog(@"%@", currentStage);
@@ -377,8 +379,10 @@ float fillChamberTopTime       ;
 
 
 - (void)fillChamberPart2:(NSTimer *)timer {
-    self.currentStage = 1;
+    self.currentStage = 0;
+    self.stageStepper.value = self.currentStage;
 
+    
     float progress = (1.0/5.0)/3.0;
     self.bioreactorProgress.progress = progress;
     
@@ -419,7 +423,8 @@ float fillChamberTopTime       ;
 
 //Event	Replace Chamber 1 Bottom				Replacing chambers needs to be using either M1 or M2 opposite of what it filled with. If M1 filled, then M2 would replace and vice versa
 - (void) replaceChamberBottomPart1 {
-    self.currentStage = 2;
+    self.currentStage = 1;
+    self.stageStepper.value = self.currentStage;
 
     self.bioreactorProgress.progress = (1.0/5.0);
     NSString *currentStage = [NSString stringWithFormat:@"1: Replace Chamber Bottom"];
@@ -454,7 +459,8 @@ float fillChamberTopTime       ;
 
 //Event	Replace Chamber 1 Top							Replacing chambers needs to be using either M1 or M2 opposite of what it filled with. If M1 filled, then M2 replaces and vice versa
 - (void) replaceChamberTopPart1 {
-    self.currentStage = 3;
+    self.currentStage = 2;
+    self.stageStepper.value = self.currentStage;
 
     self.bioreactorProgress.progress = (2.0/5.0);
     NSString *currentStage = [NSString stringWithFormat:@"2: Replace Chamber Top"];
@@ -492,8 +498,9 @@ float fillChamberTopTime       ;
 
 //Event	Empty Chamber 1 Top				Emptying uses M3 all times
 - (void) emptyChamberTopPart1 {
-    self.currentStage = 4;
-    
+    self.currentStage = 3;
+    self.stageStepper.value = self.currentStage;
+
     self.bioreactorProgress.progress = (3.0/5.0);
     NSString *currentStage = [NSString stringWithFormat:@"3: Empty Chamber Top"];
     NSLog(@"%@", currentStage);
@@ -531,8 +538,9 @@ float fillChamberTopTime       ;
 
 //Event	Fill Chamber 1 Top (Backfill)				For filling chambers, there needs to be an option to choose between M1 and M2
 - (void) fillChamberTopPart1 {
-    self.currentStage = 5;
-    
+    self.currentStage = 4;
+    self.stageStepper.value = self.currentStage;
+
     self.bioreactorProgress.progress = (4.0/5.0);
     NSString *currentStage = [NSString stringWithFormat:@"4: Fill Chamber Top (Backfill)"];
     NSLog(@"%@", currentStage);
@@ -734,6 +742,7 @@ float fillChamberTopTime       ;
         self.navigationController.navigationBarHidden = YES;
 
 
+        [self.startStop setTitle:@"Pause" forState:UIControlStateNormal];
 
         self.startStop.hidden = NO;
         [self.sequenceActivityIndicator startAnimating];
