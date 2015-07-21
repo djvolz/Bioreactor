@@ -216,9 +216,9 @@ uint8_t M1   = 22;
 uint8_t M2   = 23;
 uint8_t M3   = 24;
 
-uint8_t TV   = 25;
+uint8_t TV   = 27;
 uint8_t TVex = 38;
-uint8_t BV   = 27;
+uint8_t BV   = 29;
 uint8_t BVex = 28;
 
 float fillChamberPart1Time     ;
@@ -233,12 +233,12 @@ float fillChamberTopTime       ;
 - (IBAction)selectChamberSegmentedControl:(UISegmentedControl *)sender {
     if ([sender selectedSegmentIndex] == 0)
     {
-        TV   = 25;
+        TV   = 27;
         TVex = 38;
-        BV   = 27;
+        BV   = 29;
         BVex = 28;
     } else if ([sender selectedSegmentIndex] == 1) {
-        TV   = 29;
+        TV   = 25;
         TVex = 30;
         BV   = 31;
         BVex = 32;
