@@ -576,6 +576,8 @@ float fillChamberTopTime       ;
     // Step 1	ON	M1, TV
     [self switchPin:M1 toState:HIGH];
     [self switchPin:BV toState:HIGH];
+    [self switchPin:BVex toState:HIGH];
+
     
     // Step 2	Pause 	Fill 35 Sec
     [self createTimer];
@@ -587,6 +589,8 @@ float fillChamberTopTime       ;
     // Step 3	OFF	M1, TV
     [self switchPin:M1 toState:LOW];
     [self switchPin:BV toState:LOW];
+    [self switchPin:BVex toState:LOW];
+
     
     [self handleEndOfSequenceGUIElements:YES];
 }
@@ -608,6 +612,10 @@ float fillChamberTopTime       ;
     
     bioreactorPreferences = [[NSMutableDictionary alloc] init];
     
+//    Stage *stage = [[Stage alloc] init];
+//    
+//    stage = [self setupStagewithName:@"fillChamberPart1Time" andTime:[NSNumber numberWithFloat: 25.0]];
+    
     [bioreactorPreferences setObject: fillChamberPart1Time     forKey:@"fillChamberPart1Time"];
     [bioreactorPreferences setObject: fillChamberPart2Time     forKey:@"fillChamberPart2Time"];
     [bioreactorPreferences setObject: replaceChamberBottomTime forKey:@"replaceChamberBottomTime"];
@@ -617,6 +625,11 @@ float fillChamberTopTime       ;
     
     return bioreactorPreferences;
 }
+
+//- (Stage *)setupStagewithName:(NSString *)name andTime:(NSNumber *)time {
+//    Stage *stage = [[Stage alloc] init];
+//
+//}
 
 - (NSString *)getPathForPLIST {
     //PLIST Variables

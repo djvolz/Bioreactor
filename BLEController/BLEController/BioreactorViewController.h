@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "RBLProtocol.h"
 #import "BLE.h"
+#import "Stage.h"
 
 @interface BioreactorViewController : UIViewController <ProtocolDelegate>
 {
