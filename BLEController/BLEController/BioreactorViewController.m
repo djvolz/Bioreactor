@@ -282,6 +282,9 @@ float fillChamberTopTime       ;
         case 4:
             self.currentStageLabel.text = [NSString stringWithFormat:@"Fill Chamber Top (Backfill)"];
             break;
+        case 5:
+            self.currentStageLabel.text = [NSString stringWithFormat:@"Fill Chamber Bottom"];
+            break;
         default:
             break;
     }
@@ -343,6 +346,8 @@ float fillChamberTopTime       ;
         case 4:
             [self fillChamberTopPart1];
             break;
+        case 5:
+            [self fillChamberBottomPart1];
         default:
             [self fillChamberStep1];
             break;
@@ -360,10 +365,9 @@ float fillChamberTopTime       ;
 //Event	Fill Chamber 1						For filling chambers, there needs to be an option to choose between M1 and M2
 - (void)fillChamberStep1 {
     self.currentStage = 0;
-    self.stageStepper.value = self.currentStage;
     
     self.bioreactorProgress.progress = 0;
-    NSString *currentStage = [NSString stringWithFormat:@"0: Fill Top and Bottom Chamber"];
+    NSString *currentStage = [NSString stringWithFormat:@"Fill Top and Bottom Chamber"];
     NSLog(@"%@", currentStage);
     self.currentStageLabel.text = currentStage;
     
@@ -379,8 +383,7 @@ float fillChamberTopTime       ;
 
 
 - (void)fillChamberPart2:(NSTimer *)timer {
-    self.currentStage = 0;
-    self.stageStepper.value = self.currentStage;
+    self.currentStage = 1;
 
     
     float progress = (1.0/5.0)/3.0;
@@ -423,11 +426,10 @@ float fillChamberTopTime       ;
 
 //Event	Replace Chamber 1 Bottom				Replacing chambers needs to be using either M1 or M2 opposite of what it filled with. If M1 filled, then M2 would replace and vice versa
 - (void) replaceChamberBottomPart1 {
-    self.currentStage = 1;
-    self.stageStepper.value = self.currentStage;
+    self.currentStage = 2;
 
     self.bioreactorProgress.progress = (1.0/5.0);
-    NSString *currentStage = [NSString stringWithFormat:@"1: Replace Chamber Bottom"];
+    NSString *currentStage = [NSString stringWithFormat:@"Replace Chamber Bottom"];
     NSLog(@"%@", currentStage);
     self.currentStageLabel.text = currentStage;
 
@@ -459,11 +461,10 @@ float fillChamberTopTime       ;
 
 //Event	Replace Chamber 1 Top							Replacing chambers needs to be using either M1 or M2 opposite of what it filled with. If M1 filled, then M2 replaces and vice versa
 - (void) replaceChamberTopPart1 {
-    self.currentStage = 2;
-    self.stageStepper.value = self.currentStage;
+    self.currentStage = 3;
 
     self.bioreactorProgress.progress = (2.0/5.0);
-    NSString *currentStage = [NSString stringWithFormat:@"2: Replace Chamber Top"];
+    NSString *currentStage = [NSString stringWithFormat:@"Replace Chamber Top"];
     NSLog(@"%@", currentStage);
     self.currentStageLabel.text = currentStage;
     
@@ -498,11 +499,10 @@ float fillChamberTopTime       ;
 
 //Event	Empty Chamber 1 Top				Emptying uses M3 all times
 - (void) emptyChamberTopPart1 {
-    self.currentStage = 3;
-    self.stageStepper.value = self.currentStage;
+    self.currentStage = 4;
 
     self.bioreactorProgress.progress = (3.0/5.0);
-    NSString *currentStage = [NSString stringWithFormat:@"3: Empty Chamber Top"];
+    NSString *currentStage = [NSString stringWithFormat:@"Empty Chamber Top"];
     NSLog(@"%@", currentStage);
     self.currentStageLabel.text = currentStage;
     
@@ -538,11 +538,10 @@ float fillChamberTopTime       ;
 
 //Event	Fill Chamber 1 Top (Backfill)				For filling chambers, there needs to be an option to choose between M1 and M2
 - (void) fillChamberTopPart1 {
-    self.currentStage = 4;
-    self.stageStepper.value = self.currentStage;
+    self.currentStage = 5;
 
     self.bioreactorProgress.progress = (4.0/5.0);
-    NSString *currentStage = [NSString stringWithFormat:@"4: Fill Chamber Top (Backfill)"];
+    NSString *currentStage = [NSString stringWithFormat:@"Fill Chamber Top (Backfill)"];
     NSLog(@"%@", currentStage);
     self.currentStageLabel.text = currentStage;
     
@@ -560,6 +559,34 @@ float fillChamberTopTime       ;
     // Step 3	OFF	M1, TV
     [self switchPin:M1 toState:LOW];
     [self switchPin:TV toState:LOW];
+    
+    [self handleEndOfSequenceGUIElements:YES];
+}
+
+//Event	Fill Chamber Bottom
+- (void) fillChamberBottomPart1 {
+    self.currentStage = 6;
+    self.stageStepper.value = self.currentStage;
+    
+    self.bioreactorProgress.progress = (5.0/5.0);
+    NSString *currentStage = [NSString stringWithFormat:@"Fill Chamber Bottom"];
+    NSLog(@"%@", currentStage);
+    self.currentStageLabel.text = currentStage;
+    
+    // Step 1	ON	M1, TV
+    [self switchPin:M1 toState:HIGH];
+    [self switchPin:BV toState:HIGH];
+    
+    // Step 2	Pause 	Fill 35 Sec
+    [self createTimer];
+}
+
+- (void)fillChamberBottomPart2:(NSTimer *)timer {
+    self.bioreactorProgress.progress = (5.0/5.0);
+    
+    // Step 3	OFF	M1, TV
+    [self switchPin:M1 toState:LOW];
+    [self switchPin:BV toState:LOW];
     
     [self handleEndOfSequenceGUIElements:YES];
 }
@@ -623,6 +650,14 @@ float fillChamberTopTime       ;
 }
 
 
+
+
+
+
+
+
+
+
 #pragma mark - Timer Handling
 
 -(IBAction)clicked:(UIButton *)sender
@@ -668,6 +703,9 @@ float fillChamberTopTime       ;
         [self.scheduleTimer setFireDate:[NSDate dateWithTimeInterval:pauseTime sinceDate:previousFireDate]];
     }
 }
+
+
+
 
 - (void)createTimer {
     NSLog(@"Current date: %@", [NSDate date]);
@@ -722,12 +760,25 @@ float fillChamberTopTime       ;
                                                                 userInfo:nil
                                                                  repeats:NO];
             NSLog(@"Time: %f", fillChamberTopTime);
+            
+            // Fill chamber bottom has the same time as fill chamber top
+        case 6:
+            self.scheduleTimer = [NSTimer scheduledTimerWithTimeInterval:fillChamberTopTime
+                                                                  target:self
+                                                                selector:@selector(fillChamberBottomPart2:)
+                                                                userInfo:nil
+                                                                 repeats:NO];
+            NSLog(@"Time: %f", fillChamberTopTime);
 
             break;
         default:
             break;
     }
 }
+
+
+
+
 
 
 #pragma mark - Helper Functions
