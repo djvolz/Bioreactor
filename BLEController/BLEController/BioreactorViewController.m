@@ -348,6 +348,7 @@ float fillChamberTopTime       ;
             break;
         case 5:
             [self fillChamberBottomPart1];
+            break;
         default:
             [self fillChamberStep1];
             break;
@@ -566,7 +567,6 @@ float fillChamberTopTime       ;
 //Event	Fill Chamber Bottom
 - (void) fillChamberBottomPart1 {
     self.currentStage = 6;
-    self.stageStepper.value = self.currentStage;
     
     self.bioreactorProgress.progress = (5.0/5.0);
     NSString *currentStage = [NSString stringWithFormat:@"Fill Chamber Bottom"];
